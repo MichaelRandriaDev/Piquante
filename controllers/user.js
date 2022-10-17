@@ -1,28 +1,39 @@
 const bcrypt = require('bcrypt'); // Hash de mdp utilisateur
 const jwt = require('jsonwebtoken'); // Token d'authentification
+const validator = require("email-validator");
 require('dotenv').config();
 
 const User = require('../models/user');
 
 exports.signup = (req, res, next) => {
     const passwordValidator = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
+    const emailValidator = validator.validate(req.body.email);
 
-    if (passwordValidator.test(req.body.password)){
-        bcrypt.hash(req.body.password, 10)
-        .then(hash => {
-            const user = new User({
-                email: req.body.email,
-                password: hash
-            });
-            user.save()
-            .then(() => res.status(201).json({ message: 'Utilisateur créé !'}))
-            .catch(error => res.status(400).json({ error })); //
-        })
-        .catch(error => res.status(500).json({ error }));
+    if (!emailValidator) {
+        res.writeHead(400, 'Email incorrect !"}', {
+          "content-type": "application/json",
+        });
+        res.end("Le format de l'email est incorrect.");
+    } else {
+        if (passwordValidator.test(req.body.password)){
+            bcrypt
+            .hash(req.body.password, 10)
+            .then(hash => {
+                const user = new User({
+                    email: req.body.email,
+                    password: hash
+                });
+                user
+                .save()
+                .then(() => res.status(201).json({ message: 'Utilisateur créé !'}))
+                .catch(error => res.status(400).json({ error })); //
+            })
+            .catch(error => res.status(500).json({ error }));
+        }
+        else {
+            res.status(400).json({message: "Le mot de passe doit faire une taille de 8 caractères minimum et contenir 1 majuscule + 1 minuscule + 1 chiffre + 1 symbole"});
+        }
     }
-    else {
-        res.status(400).json({message: "Le mot de passe doit faire une taille de 8 caractères minimum et contenir 1 majuscule + 1 minuscule + 1 chiffre + 1 symbole"});
-    } 
 };
 
 exports.login = (req, res, next) => {

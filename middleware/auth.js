@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const dotenv = require('dotenv');
 
 module.exports = (req, res, next) => {
     try {
+        dotenv.config();
         const token = req.headers.authorization.split(' ')[1]; // Extraction du token de la requête entrante
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY); // Vérification du token
         const userId = decodedToken.userId; // Extraction de l'userID puis ajout à l'objet Request

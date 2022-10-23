@@ -6,8 +6,8 @@ require('dotenv').config();
 const User = require('../models/user');
 
 exports.signup = (req, res, next) => {
-    const passwordValidator = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
     const emailValidator = validator.validate(req.body.email);
+    const passwordValidator = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/;
 
     if (!emailValidator) {
         res.writeHead(400, 'Email incorrect !"}', {
